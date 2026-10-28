@@ -1,0 +1,1042 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Color System - One Piece Logo Colors */
+  --primary-blue: #1E88E5; /* Blue dari logo */
+  --primary-blue-dark: #1565C0; /* Blue gradient gelap */
+  --primary-blue-light: #42A5F5; /* Blue gradient terang */
+  --primary-red: #E53935; /* Red Luffy silhouette */
+  --primary-yellow: #FFD54F; /* Yellow topi jerami */
+  --primary-brown: #8D6E63; /* Brown tali tambang */
+  --pure-white: #FFFFFF;
+  --off-white: #F8F9FA;
+  --light-cream: #FFFEF7;
+  --dark-text: #212121; /* Hitam outline */
+  --medium-gray: #757575;
+  
+  /* Derived colors */
+  --blue-light: rgba(30, 136, 229, 0.1);
+  --red-light: rgba(229, 57, 53, 0.1);
+  
+  /* Spacing Scale */
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-5: 2.5rem;
+  --space-6: 3rem;
+  --space-8: 4rem;
+  --space-10: 5rem;
+  --space-12: 6rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--light-cream);
+  color: var(--dark-text);
+  font-family: var(--font-cinzel), serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  color: var(--pure-white);
+  background: var(--primary-blue);
+}
+
+button,
+a {
+  color: inherit;
+  font: inherit;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+.voyage-experience {
+  position: relative;
+  isolation: isolate;
+  background: var(--light-cream);
+}
+
+.voyage-scene {
+  position: relative;
+  height: 200vh;
+  height: 200svh;
+  scroll-margin-top: 0;
+  background: linear-gradient(180deg, var(--light-cream) 0%, var(--off-white) 100%);
+}
+
+.voyage-scene__stage {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--light-cream);
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.voyage-progress {
+  position: fixed;
+  z-index: 80;
+  inset: 0 0 auto;
+  height: 4px;
+  pointer-events: none;
+  background: rgba(30, 136, 229, 0.2);
+}
+
+.voyage-progress__fill {
+  width: 100%;
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--primary-blue-light), var(--primary-blue-dark));
+  box-shadow: 0 0 12px rgba(30, 136, 229, 0.5);
+}
+
+.voyage-preloader {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 24px;
+  background: var(--light-cream);
+  animation: preloader-arrive 450ms ease-out both;
+}
+
+.voyage-preloader__mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+  height: auto;
+  animation: preloader-pulse 1.4s ease-in-out infinite;
+}
+
+.voyage-preloader__mark img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.voyage-preloader__label {
+  color: var(--dark-text);
+  font-family: var(--font-bangers), sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.voyage-preloader__track {
+  width: 140px;
+  height: 4px;
+  overflow: hidden;
+  background: rgba(30, 136, 229, 0.2);
+  border-radius: 2px;
+}
+
+.voyage-preloader__track span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-blue-light), var(--primary-blue-dark));
+  animation: preloader-progress 1.2s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(30, 136, 229, 0.6);
+}
+
+.voyage-header {
+  position: fixed;
+  z-index: 70;
+  top: 0;
+  left: 0;
+  display: flex;
+  width: 100%;
+  height: 80px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(24px, 5vw, 64px);
+  background: var(--pure-white);
+  border-bottom: 3px solid var(--primary-blue);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(0);
+  transition: all 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.voyage-header.scrolled {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.voyage-header.hidden {
+  transform: translateY(-100%);
+  box-shadow: none;
+}
+
+/* Music Visualizer Button - Bottom Right */
+.music-visualizer {
+  position: fixed;
+  z-index: 80;
+  bottom: 40px;
+  right: clamp(24px, 5vw, 64px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  width: 64px;
+  height: 64px;
+  padding: 12px;
+  border: 3px solid var(--primary-blue);
+  border-radius: 50%;
+  background: var(--pure-white);
+  box-shadow: 0 4px 20px rgba(30, 136, 229, 0.3);
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.music-visualizer:hover {
+  transform: scale(1.1) translateZ(0);
+  background: var(--primary-blue);
+  box-shadow: 0 6px 28px rgba(30, 136, 229, 0.5);
+}
+
+.music-visualizer:hover .visualizer-bar {
+  background: var(--pure-white);
+}
+
+.music-visualizer:active {
+  transform: scale(0.95) translateZ(0);
+}
+
+.visualizer-bar {
+  width: 5px;
+  height: 12px;
+  background: var(--primary-blue);
+  border-radius: 10px;
+  transition: all 300ms ease;
+  animation: none;
+}
+
+.music-visualizer.is-playing .visualizer-bar {
+  animation: visualizerBounce 0.8s ease-in-out infinite;
+}
+
+@keyframes visualizerBounce {
+  0%, 100% {
+    height: 12px;
+  }
+  50% {
+    height: 32px;
+  }
+}
+
+@media (max-width: 760px) {
+  .music-visualizer {
+    bottom: 24px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    padding: 10px;
+  }
+  
+  .visualizer-bar {
+    width: 4px;
+    height: 10px;
+  }
+  
+  @keyframes visualizerBounce {
+    0%, 100% {
+      height: 10px;
+    }
+    50% {
+      height: 28px;
+    }
+  }
+}
+
+.voyage-brand {
+  display: inline-flex;
+  align-items: center;
+  transition: transform 200ms ease;
+}
+
+.voyage-brand:hover {
+  transform: scale(1.05);
+}
+
+.voyage-brand__logo {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+}
+
+.voyage-brand__mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  transition: all 200ms ease;
+}
+
+.voyage-brand__mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.voyage-brand:hover .voyage-brand__mark {
+  transform: scale(1.1);
+}
+
+.voyage-menu {
+  display: flex;
+  align-items: center;
+  gap: clamp(32px, 5vw, 48px);
+}
+
+.voyage-menu > a {
+  position: relative;
+  padding: 8px 0;
+  color: var(--dark-text);
+  font-family: var(--font-bangers), sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all 200ms ease;
+}
+
+.voyage-menu > a::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: var(--primary-blue);
+  content: "";
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.voyage-menu > a:hover,
+.voyage-menu > a:focus-visible {
+  color: var(--primary-blue);
+  transform: translateY(-2px);
+}
+
+.voyage-menu > a:hover::after,
+.voyage-menu > a:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.voyage-menu__edition {
+  padding-left: 24px;
+  margin-left: 24px;
+  border-left: 2px solid var(--primary-blue);
+  color: var(--primary-blue);
+  font-family: var(--font-cinzel), serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.voyage-menu__edition i {
+  padding: 0 6px;
+  color: var(--primary-red);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.menu-toggle {
+  display: none;
+}
+
+.scene-nav {
+  display: none;
+}
+
+.scene-nav__counter {
+  margin-bottom: 6px;
+  color: var(--primary-red);
+  font-family: var(--font-cinzel), serif;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.scene-nav__counter span {
+  padding: 0 4px;
+  color: var(--medium-gray);
+}
+
+.scene-nav ol {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scene-nav__item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--medium-gray);
+  transition: color 180ms ease;
+}
+
+.scene-nav__number {
+  font-family: var(--font-cinzel), serif;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+
+.scene-nav__label {
+  width: 0;
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  opacity: 0;
+  transition: width 180ms ease, opacity 180ms ease;
+}
+
+.scene-nav__item::after {
+  width: 6px;
+  height: 6px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  content: "";
+  transition: transform 180ms ease, background 180ms ease;
+}
+
+.scene-nav__item:hover,
+.scene-nav__item.is-active {
+  color: var(--primary-red);
+}
+
+.scene-nav__item.is-active .scene-nav__label,
+.scene-nav__item:hover .scene-nav__label,
+.scene-nav__item:focus-visible .scene-nav__label {
+  width: 82px;
+  opacity: 1;
+}
+
+.scene-nav__item.is-active::after {
+  background: var(--primary-red);
+  transform: scale(1.35);
+}
+
+.scene-image-layer,
+.scene-image,
+.scene-shade,
+.scene-haze,
+.scene-foreground {
+  position: absolute;
+  inset: 0;
+}
+
+.scene-image-layer {
+  overflow: hidden;
+  background: var(--off-white);
+}
+
+.scene-image {
+  inset: -5%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 65% center;
+  filter: saturate(1.2) brightness(1.1) contrast(1.05);
+  will-change: transform;
+  animation: kenBurns 20s ease-out infinite alternate;
+}
+
+.scene-canvas {
+  width: 110%;
+  height: 110%;
+  will-change: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+@keyframes kenBurns {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+
+.scene--giants {
+  background: var(--light-cream);
+}
+
+/* Overlay transparan - semua scene tanpa overlay */
+.scene-shade {
+  display: none;
+}
+
+.scene-shade::after {
+  display: none;
+}
+
+.scene-haze {
+  display: none;
+}
+
+.scene--giants .scene-shade {
+  display: none;
+}
+
+.scene-foreground {
+  display: none;
+}
+
+.scene-copy {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 clamp(24px, 5vw, 64px);
+  will-change: transform, opacity;
+}
+
+/* Eyebrow - Hidden initially, animated by GSAP */
+.scene-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 var(--space-3);
+  color: var(--primary-blue);
+  font-family: var(--font-cinzel), serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0;
+}
+
+.scene-eyebrow__rule {
+  width: 40px;
+  height: 3px;
+  background: var(--primary-red);
+}
+
+/* Headline - Rye untuk main, Bangers untuk secondary - Hidden initially */
+.scene-copy h1 {
+  display: flex;
+  flex-direction: column;
+  max-width: 60%;
+  margin: 0 0 var(--space-4);
+  color: var(--pure-white);
+  font-family: var(--font-rye), serif;
+  font-size: clamp(48px, 8vw, 110px);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  text-shadow: 
+    3px 3px 0 var(--primary-blue),
+    -2px -2px 0 var(--primary-yellow),
+    0 0 8px rgba(0, 0, 0, 0.5);
+  -webkit-text-stroke: 2px var(--dark-text);
+  paint-order: stroke fill;
+  opacity: 0;
+}
+
+.scene-title-mask {
+  display: block;
+  overflow: hidden;
+  padding: 0.025em 0;
+}
+
+.scene-title-line {
+  display: block;
+  will-change: transform;
+}
+
+/* "THE CLOUDS" - Bangers dengan warna berbeda */
+.scene-title-mask--secondary {
+  color: var(--primary-red);
+  font-family: var(--font-bangers), sans-serif;
+  font-size: clamp(52px, 9vw, 130px);
+  letter-spacing: 0.05em;
+  text-shadow: 
+    3px 3px 0 var(--primary-yellow),
+    -2px -2px 0 var(--primary-blue),
+    0 0 8px rgba(0, 0, 0, 0.5);
+  -webkit-text-stroke: 2px var(--dark-text);
+  paint-order: stroke fill;
+}
+
+/* Subtitle - Cinzel - Hidden initially */
+.scene-description {
+  position: relative;
+  max-width: 480px;
+  margin: 0 0 var(--space-5);
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.95);
+  border-left: 4px solid var(--primary-blue);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: var(--dark-text);
+  font-family: var(--font-cinzel), serif;
+  font-size: clamp(16px, 1.6vw, 19px);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.7;
+  opacity: 0;
+}
+
+.scene-description::before {
+  display: none;
+}
+
+.scene-action {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  min-height: 60px;
+  align-items: center;
+  gap: 16px;
+  padding: 0 32px 0 36px;
+  border: 4px solid var(--dark-text);
+  border-radius: 50px;
+  background: var(--primary-blue);
+  color: var(--pure-white);
+  font-family: var(--font-bangers), sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: 
+    4px 4px 0 var(--dark-text),
+    0 6px 16px rgba(0, 0, 0, 0.15);
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+}
+
+.scene-action:hover,
+.scene-action:focus-visible {
+  gap: 20px;
+  background: var(--primary-red);
+  transform: translate(-2px, -2px);
+  box-shadow: 
+    6px 6px 0 var(--dark-text),
+    0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.scene-action:focus-visible {
+  outline: 3px solid var(--primary-yellow);
+  outline-offset: 4px;
+}
+
+.scene-action__arrow {
+  color: var(--pure-white);
+  font-size: 22px;
+  font-weight: bold;
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scene-action:hover .scene-action__arrow,
+.scene-action:focus-visible .scene-action__arrow {
+  transform: translate(4px, -4px) rotate(15deg);
+}
+
+.scroll-cue {
+  display: none;
+}
+
+.scene-index {
+  display: none;
+}
+
+.scene--harbor .scene-image {
+  filter: saturate(1.3) brightness(1.0) contrast(1.1);
+}
+
+.scene--giants .scene-shade {
+  display: none;
+}
+
+@keyframes scroll-line {
+  0% { transform: translateY(-100%); }
+  60%, 100% { transform: translateY(100%); }
+}
+
+@keyframes preloader-arrive {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes preloader-pulse {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% { 
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+@keyframes preloader-progress {
+  from { transform: translateX(-120%); }
+  to { transform: translateX(340%); }
+}
+
+@media (max-width: 760px) {
+  .voyage-header {
+    height: 76px;
+    padding: 0 24px;
+  }
+
+  .voyage-brand {
+    gap: 10px;
+    font-size: 14px;
+  }
+
+  .voyage-brand__mark {
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+  }
+
+  .menu-toggle {
+    z-index: 2;
+    display: flex;
+    width: 48px;
+    height: 48px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 3px solid var(--dark-text);
+    background: var(--pure-white);
+    border-radius: 8px;
+  }
+
+  .menu-toggle span {
+    width: 22px;
+    height: 3px;
+    background: var(--dark-text);
+    transition: transform 200ms ease;
+  }
+
+  .menu-toggle.is-open span:first-child {
+    transform: translateY(4.5px) rotate(45deg);
+  }
+
+  .menu-toggle.is-open span:last-child {
+    transform: translateY(-4.5px) rotate(-45deg);
+  }
+
+  .voyage-menu {
+    position: absolute;
+    top: 75px;
+    right: 0;
+    left: 0;
+    display: none;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0;
+    padding: 24px;
+    background: var(--pure-white);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    border-top: 3px solid var(--primary-blue);
+  }
+
+  .voyage-menu.is-open {
+    display: flex;
+  }
+
+  .voyage-menu > a {
+    padding: 16px 0;
+    border-bottom: 2px solid var(--blue-light);
+    font-size: 20px;
+  }
+
+  .voyage-menu__edition {
+    display: none;
+  }
+
+  .scene-nav {
+    display: none;
+  }
+
+  .voyage-scene__stage {
+    align-items: flex-end;
+  }
+
+  .scene-image {
+    background-position: center !important;
+    filter: saturate(1.2) brightness(1.05) contrast(1.05);
+  }
+
+  .scene-shade {
+    display: none;
+  }
+
+  .scene-copy {
+    padding: 0 24px var(--space-10) 24px;
+  }
+
+  .scene-eyebrow {
+    gap: 10px;
+    margin-bottom: var(--space-2);
+    font-size: 12px;
+  }
+
+  .scene-eyebrow__rule {
+    width: 32px;
+  }
+
+  .scene-copy h1 {
+    max-width: 100%;
+    font-size: clamp(40px, 12vw, 70px);
+    margin-bottom: var(--space-3);
+    -webkit-text-stroke: 1.5px var(--dark-text);
+    text-shadow: 
+      2px 2px 0 var(--primary-blue),
+      -1px -1px 0 var(--primary-yellow),
+      0 0 6px rgba(0, 0, 0, 0.5);
+  }
+
+  .scene-title-mask--secondary {
+    font-size: clamp(44px, 13vw, 80px);
+    -webkit-text-stroke: 1.5px var(--dark-text);
+    text-shadow: 
+      2px 2px 0 var(--primary-yellow),
+      -1px -1px 0 var(--primary-blue),
+      0 0 6px rgba(0, 0, 0, 0.5);
+  }
+
+  .scene-description {
+    max-width: 100%;
+    margin-bottom: var(--space-4);
+    padding: 14px 18px;
+    font-size: 15px;
+  }
+
+  .scene-action {
+    min-height: 54px;
+    width: 100%;
+    justify-content: center;
+    padding: 0 28px;
+    font-size: 18px;
+  }
+
+  .scroll-cue {
+    bottom: 32px;
+    font-size: 11px;
+  }
+
+  .scroll-cue__line {
+    height: 32px;
+  }
+
+  .scene-index {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .scene-copy h1 {
+    font-size: 35px;
+  }
+}
+
+/* Footer Styles */
+.voyage-footer {
+  position: relative;
+  background: linear-gradient(180deg, var(--light-cream) 0%, var(--off-white) 100%);
+  border-top: 4px solid var(--primary-blue);
+  padding: var(--space-10) 0 var(--space-6);
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 clamp(24px, 5vw, 64px);
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--space-8);
+  margin-bottom: var(--space-8);
+}
+
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.footer-logo {
+  width: 150px;
+  height: auto;
+  object-fit: contain;
+}
+
+.footer-tagline {
+  color: var(--primary-blue);
+  font-family: var(--font-bangers), sans-serif;
+  font-size: 18px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.footer-links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+}
+
+.footer-column h3 {
+  margin: 0 0 var(--space-3);
+  color: var(--primary-red);
+  font-family: var(--font-bangers), sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.footer-column ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.footer-column a {
+  color: var(--dark-text);
+  font-family: var(--font-cinzel), serif;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 200ms ease;
+}
+
+.footer-column a:hover {
+  color: var(--primary-blue);
+  transform: translateX(4px);
+}
+
+.footer-bottom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-4) clamp(24px, 5vw, 64px) 0;
+  border-top: 2px solid var(--blue-light);
+  text-align: center;
+}
+
+.footer-bottom p {
+  margin: var(--space-1) 0;
+  color: var(--medium-gray);
+  font-family: var(--font-cinzel), serif;
+  font-size: 13px;
+}
+
+.footer-disclaimer {
+  font-size: 12px !important;
+  font-style: italic;
+}
+
+/* Footer Mobile */
+@media (max-width: 760px) {
+  .voyage-footer {
+    padding: var(--space-8) 0 var(--space-4);
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+  }
+
+  .footer-brand {
+    text-align: center;
+    align-items: center;
+  }
+
+  .footer-logo {
+    width: 120px;
+  }
+
+  .footer-links {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  .footer-column h3 {
+    font-size: 18px;
+    margin-bottom: var(--space-2);
+  }
+
+  .footer-bottom {
+    padding-top: var(--space-3);
+  }
+
+  .footer-bottom p {
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
