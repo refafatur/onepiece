@@ -97,8 +97,8 @@ button {
 
 .voyage-scene {
   position: relative;
-  height: 200vh;
-  height: 200svh;
+  height: 300vh;
+  height: 300svh;
   scroll-margin-top: 0;
   background: linear-gradient(180deg, var(--light-cream) 0%, var(--off-white) 100%);
 }
@@ -498,8 +498,6 @@ button {
   background-size: cover;
   background-position: 65% center;
   filter: saturate(1.2) brightness(1.1) contrast(1.05);
-  will-change: transform;
-  animation: kenBurns 20s ease-out infinite alternate;
 }
 
 .scene-canvas {

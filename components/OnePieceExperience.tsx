@@ -99,7 +99,7 @@ export default function OnePieceExperience() {
   const [loadProgress, setLoadProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // Initialize Lenis smooth scrolling
+  // Initialize Lenis smooth scrolling & sync with GSAP ticker
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.2,
@@ -107,20 +107,22 @@ export default function OnePieceExperience() {
       orientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 1,
-      touchMultiplier: 2,
+      touchMultiplier: 1.5,
       infinite: false,
     });
 
     lenisRef.current = lenis;
 
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-
-    requestAnimationFrame(raf);
+    // Single unified RAF loop driven by GSAP ticker
+    lenis.on('scroll', ScrollTrigger.update);
+    const updateLenis = (time: number) => {
+      lenis.raf(time * 1000);
+    };
+    gsap.ticker.add(updateLenis);
+    gsap.ticker.lagSmoothing(1000, 16);
 
     return () => {
+      gsap.ticker.remove(updateLenis);
       lenis.destroy();
     };
   }, []);
@@ -208,21 +210,12 @@ export default function OnePieceExperience() {
   useEffect(() => {
     const experience = experienceRef.current;
     const imageCache = imageCacheRef.current;
-    const lenis = lenisRef.current;
     if (!experience || isLoading) return;
-
-    // Connect GSAP ScrollTrigger with Lenis
-    if (lenis) {
-      lenis.on('scroll', ScrollTrigger.update);
-      gsap.ticker.add((time) => {
-        lenis.raf(time * 1000);
-      });
-      gsap.ticker.lagSmoothing(0);
-    }
 
     const sectionElements = gsap.utils.toArray<HTMLElement>(".voyage-scene", experience);
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let activeFrame = 0;
+    const lastRenderedFrame: { [key: number]: number } = {};
 
     const drawFrame = (sceneIndex: number, image: HTMLImageElement) => {
       const canvas = canvasesRef.current[sceneIndex];
@@ -243,14 +236,12 @@ export default function OnePieceExperience() {
       }
 
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-      context.clearRect(0, 0, bounds.width, bounds.height);
       const scale = Math.max(bounds.width / image.naturalWidth, bounds.height / image.naturalHeight);
       const drawWidth = image.naturalWidth * scale;
       const drawHeight = image.naturalHeight * scale;
       
-      // Use image smoothing for better quality
       context.imageSmoothingEnabled = true;
-      context.imageSmoothingQuality = 'high';
+      context.imageSmoothingQuality = 'medium';
       
       context.drawImage(
         image,
@@ -261,24 +252,24 @@ export default function OnePieceExperience() {
       );
     };
 
-    const requestFrame = (sceneIndex: number, frameIndex: number) => {
+    const renderSceneFrame = (sceneIndex: number, frameIndex: number) => {
+      if (lastRenderedFrame[sceneIndex] === frameIndex) return;
+      
       const key = `${sceneIndex}:${frameIndex}`;
       const image = imageCache.get(key);
       
       if (image && image.complete) {
         activeFrame = frameIndex;
+        lastRenderedFrame[sceneIndex] = frameIndex;
         drawFrame(sceneIndex, image);
       }
     };
 
-    const updateScene = (sceneIndex: number, progress: number) => {
-      const scene = scenes[sceneIndex];
-      const frameIndex = Math.round(progress * (scene.frameCount - 1));
-      requestFrame(sceneIndex, frameIndex);
-    };
-
     const context = gsap.context(() => {
-      requestFrame(0, 0);
+      // Initial render for each scene
+      scenes.forEach((_, idx) => {
+        renderSceneFrame(idx, 0);
+      });
 
       ScrollTrigger.create({
         trigger: experience,
@@ -295,32 +286,39 @@ export default function OnePieceExperience() {
         const image = section.querySelector<HTMLElement>(".scene-image");
         const haze = section.querySelector<HTMLElement>(".scene-haze");
         const foreground = section.querySelector<HTMLElement>(".scene-foreground");
-        const copy = section.querySelector<HTMLElement>(".scene-copy");
         const titleLines = section.querySelectorAll<HTMLElement>(".scene-title-line");
 
-        ScrollTrigger.create({
-          trigger: section,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: reduceMotion ? false : 1,
-          onEnter: () => {
-            activeSceneRef.current = index;
-            setActiveScene(index);
-          },
-          onEnterBack: () => {
-            activeSceneRef.current = index;
-            setActiveScene(index);
-          },
-          onUpdate: (self) => {
-            activeSceneRef.current = index;
-            setActiveScene((current) => current === index ? current : index);
-            if (!reduceMotion) updateScene(index, self.progress);
+        const scene = scenes[index];
+        const frameTracker = { frame: 0 };
+
+        // Animate frame with GSAP scrub for butter-smooth interpolation
+        gsap.to(frameTracker, {
+          frame: scene.frameCount - 1,
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: reduceMotion ? false : 0.5,
+            onEnter: () => {
+              activeSceneRef.current = index;
+              setActiveScene(index);
+            },
+            onEnterBack: () => {
+              activeSceneRef.current = index;
+              setActiveScene(index);
+            },
+            onUpdate: () => {
+              if (!reduceMotion) {
+                renderSceneFrame(index, Math.round(frameTracker.frame));
+              }
+            },
           },
         });
 
         if (reduceMotion) return;
 
-        // Image animation timeline
+        // Image subtle parallax animation timeline
         const timeline = gsap.timeline({
           scrollTrigger: {
             trigger: section,
@@ -514,7 +512,6 @@ export default function OnePieceExperience() {
                   className="scene-image scene-canvas"
                   role="img"
                   aria-label={scene.imageAlt}
-                  style={{ backgroundImage: `url("/${scene.folder}/ezgif-frame-001.webp")` }}
                 />
               </div>
               <div className="scene-shade" aria-hidden="true" />
